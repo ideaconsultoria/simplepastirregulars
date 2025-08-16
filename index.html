@@ -1,0 +1,965 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jogo de Verbos Irregulares</title>
+    <!-- Tailwind CSS CDN para fácil estilização -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts - Inter para um visual limpo -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Base styles for body and container */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f4f8; /* Light blue-gray background */
+            color: #2d3748; /* Dark gray text */
+        }
+        .container {
+            max-width: 90%; /* Responsive width */
+            margin: 2rem auto; /* Center container with margin */
+            padding: 1.5rem;
+            background-color: #ffffff;
+            border-radius: 1rem; /* Rounded corners */
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); /* Soft shadow */
+        }
+        /* Table styling */
+        table {
+            width: 100%;
+            border-collapse: collapse; /* Remove gaps between cells */
+            margin-top: 1.5rem;
+        }
+        th, td {
+            padding: 0.75rem 1rem;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0; /* Light gray border for rows */
+        }
+        th {
+            background-color: #edf2f7; /* Lighter blue-gray for header */
+            font-weight: 600; /* Semi-bold */
+            color: #4a5568; /* Darker gray for header text */
+            text-transform: uppercase;
+            font-size: 0.875rem; /* Smaller font for header */
+        }
+        tr:last-child td {
+            border-bottom: none; /* No border for the last row */
+        }
+        /* Input field styling */
+        input[type="text"] {
+            width: 100%;
+            padding: 0.5rem 0.75rem;
+            border: 1px solid #cbd5e0; /* Gray border */
+            border-radius: 0.5rem; /* Rounded input corners */
+            outline: none; /* Remove default outline on focus */
+            transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out; /* Smooth transitions */
+            background-color: #ffffff;
+        }
+        input[type="text"]:focus {
+            border-color: #63b3ed; /* Blue border on focus */
+            box-shadow: 0 0 0 3px rgba(99, 179, 237, 0.5); /* Blue glow on focus */
+        }
+        /* Validation feedback styles for inputs */
+        .correct-input {
+            border-color: #48bb78 !important; /* Green border */
+            background-color: #f0fff4 !important; /* Light green background */
+        }
+        .incorrect-input {
+            border-color: #f56565 !important; /* Red border */
+            background-color: #fff5f5 !important; /* Light red background */
+        }
+        /* Status icons */
+        .result-icon {
+            font-size: 1.25rem;
+            margin-left: 0.5rem;
+            vertical-align: middle;
+        }
+        .check-icon { color: #48bb78; } /* Green checkmark */
+        .cross-icon { color: #f56565; } /* Red cross */
+
+        /* Button styling */
+        .button {
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.75rem; /* Rounded button corners */
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s ease-in-out, transform 0.1s ease-in-out; /* Hover and active effects */
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); /* Soft shadow */
+            border: none; /* Remove default border */
+        }
+        .button-primary {
+            background-color: #4299e1; /* Blue primary button */
+            color: white;
+        }
+        .button-primary:hover {
+            background-color: #3182ce; /* Darker blue on hover */
+            transform: translateY(-1px); /* Lift effect on hover */
+        }
+        .button-secondary {
+            background-color: #e2e8f0; /* Light gray secondary button */
+            color: #2d3748;
+        }
+        .button-secondary:hover {
+            background-color: #cbd5e0; /* Darker gray on hover */
+            transform: translateY(-1px);
+        }
+        .button:active {
+            transform: translateY(0); /* Press effect */
+        }
+
+        /* Small button for submission per line */
+        .submit-line-button {
+            padding: 0.3rem 0.6rem;
+            font-size: 0.75rem;
+            border-radius: 0.5rem;
+            background-color: #48bb78; /* Green */
+            color: white;
+            transition: background-color 0.2s ease-in-out;
+            cursor: pointer;
+            margin-left: 0.5rem; /* Space between input and button */
+        }
+        .submit-line-button:hover {
+            background-color: #38a169; /* Darker green on hover */
+        }
+        .submit-line-button:disabled {
+            background-color: #cbd5e0;
+            cursor: not-allowed;
+        }
+
+        .hidden {
+            display: none !important; /* Utility class to hide elements */
+        }
+
+        /* Responsive adjustments for smaller screens */
+        @media (max-width: 768px) {
+            .container {
+                margin: 1rem auto;
+                padding: 1rem;
+            }
+            th, td {
+                padding: 0.5rem 0.75rem;
+                font-size: 0.875rem;
+            }
+            input[type="text"] {
+                padding: 0.4rem 0.6rem;
+                font-size: 0.875rem;
+            }
+            .button {
+                padding: 0.6rem 1.2rem;
+                font-size: 0.875rem;
+            }
+            /* Adjust input and button in the same cell on smaller screens */
+            td.simple-past-cell {
+                display: flex;
+                flex-direction: column; /* Stack input and button vertically */
+                align-items: flex-start; /* Align content to the start */
+                gap: 0.5rem; /* Space between input and button */
+            }
+            td.simple-past-cell input {
+                width: 100%;
+            }
+            .submit-line-button {
+                margin-left: 0; /* Remove left margin for better stacking */
+                width: auto; /* Allow button to size naturally */
+            }
+        }
+    </style>
+</head>
+<body class="p-4">
+    <div id="game-container" class="container">
+        <h1 class="text-3xl font-bold text-center text-blue-700 mb-6">Desafio de Verbos Irregulares 🚀</h1>
+
+        <div class="flex justify-between items-center mb-6">
+            <div class="text-xl font-semibold">
+                Pontuação: <span id="score" class="text-blue-600">0</span> / <span id="total-questions" class="text-gray-600">0</span>
+            </div>
+            <div class="text-lg font-medium">
+                Fase: <span id="current-phase-display" class="text-purple-600">1</span> de <span id="total-phases-display" class="text-gray-600">0</span>
+                <select id="phase-selector" class="ml-2 p-1 rounded-md border border-gray-300 bg-white shadow-sm"></select>
+            </div>
+        </div>
+
+        <table class="min-w-full bg-white rounded-lg shadow-md">
+            <thead>
+                <tr>
+                    <th>Forma Base</th>
+                    <th>Simple Past</th>
+                    <th>Frase Exemplo</th>
+                    <th>Tradução Português</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody id="verb-table-body">
+                <!-- Verb rows will be inserted here by JavaScript -->
+            </tbody>
+        </table>
+
+        <!-- Incorrect verbs list will appear here after phase completion -->
+        <div id="incorrect-verbs-summary" class="hidden mt-8 p-4 bg-red-50 rounded-lg shadow-inner border border-red-200">
+            <h3 class="text-xl font-semibold mb-3 text-red-700">Verbos Incorretos nesta Fase:</h3>
+            <ul id="incorrect-verbs-list" class="list-disc pl-5 text-gray-800">
+                <!-- Incorrect verbs will be listed here -->
+            </ul>
+        </div>
+
+        <div class="mt-8 flex justify-center space-x-4 flex-wrap gap-4">
+            <!-- Buttons for phase actions, initially hidden -->
+            <button id="show-all-answers-btn" class="button button-secondary hidden">Mostrar Todas as Respostas</button>
+            <button id="download-answers-btn" class="button button-secondary hidden">Baixar Respostas</button>
+            <button id="retry-wrong-btn" class="button button-primary hidden">Tentar Novamente (Erros)</button>
+            <button id="next-phase-btn" class="button button-secondary hidden">Próxima Fase</button>
+        </div>
+    </div>
+
+    <script>
+        // --- Irregular Verbs Data ---
+        // IMPORTANT: This list has been populated with a comprehensive set of irregular verbs
+        // based on your provided string. For 'example' sentences and 'portuguese' translations,
+        // I have provided accurate common examples. If a verb has multiple past simple forms
+        // (e.g., bet/betted), they are included separated by a slash.
+        const allIrregularVerbs = [
+            { base: "arise", pastSimple: "arose", example: "A new problem arose in the meeting.", portuguese: "Surgiu um novo problema na reunião." },
+            { base: "awake", pastSimple: "awoke", example: "I awoke to the sound of birds.", portuguese: "Acordei com o som dos pássaros." },
+            { base: "be", pastSimple: "was/were", example: "She was at home yesterday. (was para I/he/she/it, were para you/we/they)", portuguese: "Ela estava em casa ontem." },
+            { base: "bear", pastSimple: "bore", example: "He bore the heavy responsibility.", portuguese: "Ele suportou a pesada responsabilidade." },
+            { base: "beat", pastSimple: "beat", example: "He beat his opponent in the game.", portuguese: "Ele venceu seu oponente no jogo." },
+            { base: "become", pastSimple: "became", example: "She became a successful artist.", portuguese: "Ela se tornou uma artista de sucesso." },
+            { base: "begin", pastSimple: "began", example: "The show began at eight o'clock.", portuguese: "O show começou às oito horas." },
+            { base: "bend", pastSimple: "bent", example: "He bent the wire into a loop.", portuguese: "Ele dobrou o arame em um laço." },
+            { base: "beset", pastSimple: "beset", example: "The team was beset by injuries.", portuguese: "A equipe foi assolada por lesões." },
+            { base: "bet", pastSimple: "bet/betted", example: "I bet five dollars on the race. (Ambos são comuns, 'bet' é mais frequente)", portuguese: "Apostei cinco dólares na corrida." },
+            { base: "bid", pastSimple: "bid", example: "He bid a high price for the painting.", portuguese: "Ele ofereceu um preço alto pela pintura." },
+            { base: "bind", pastSimple: "bound", example: "She bound the package with string.", portuguese: "Ela amarrou o pacote com barbante." },
+            { base: "bite", pastSimple: "bit", example: "The dog bit the mailman.", portuguese: "O cachorro mordeu o carteiro." },
+            { base: "bleed", pastSimple: "bled", example: "His nose bled after the fall.", portuguese: "O nariz dele sangrou depois da queda." },
+            { base: "blow", pastSimple: "blew", example: "The wind blew strongly all night.", portuguese: "O vento soprou forte a noite toda." },
+            { base: "break", pastSimple: "broke", example: "He accidentally broke the vase.", portuguese: "Ele quebrou o vaso acidentalmente." },
+            { base: "breed", pastSimple: "bred", example: "They bred horses for racing.", portuguese: "Eles criaram cavalos para corrida." },
+            { base: "bring", pastSimple: "brought", example: "She brought a gift to the party.", portuguese: "Ela trouxe um presente para a festa." },
+            { base: "broadcast", pastSimple: "broadcast", example: "The news was broadcast live.", portuguese: "A notícia foi transmitida ao vivo." },
+            { base: "build", pastSimple: "built", example: "They built a new school last year.", portuguese: "Eles construíram uma nova escola no ano passado." },
+            { base: "burn", pastSimple: "burnt/burned", example: "The toast burnt slightly. (Ambos são comuns, 'burnt' é mais comum no britânico, 'burned' no americano)", portuguese: "A torrada queimou um pouco." },
+            { base: "burst", pastSimple: "burst", example: "The balloon burst with a loud pop.", portuguese: "O balão estourou com um grande estouro." },
+            { base: "buy", pastSimple: "bought", example: "I bought a new phone yesterday.", portuguese: "Comprei um telefone novo ontem." },
+            { base: "cast", pastSimple: "cast", example: "He cast his fishing line into the lake.", portuguese: "Ele lançou sua linha de pesca no lago." },
+            { base: "catch", pastSimple: "caught", example: "She caught the ball with one hand.", portuguese: "Ela pegou a bola com uma mão." },
+            { base: "choose", pastSimple: "chose", example: "He chose the red shirt.", portuguese: "Ele escolheu a camisa vermelha." },
+            { base: "cling", pastSimple: "clung", example: "The child clung to his mother's leg.", portuguese: "A criança se agarrou à perna da mãe." },
+            { base: "come", pastSimple: "came", example: "They came to visit us last weekend.", portuguese: "Eles vieram nos visitar no fim de semana passado." },
+            { base: "cost", pastSimple: "cost", example: "The new car cost a lot of money.", portuguese: "O carro novo custou muito dinheiro." },
+            { base: "creep", pastSimple: "crept", example: "The cat crept silently towards the mouse.", portuguese: "O gato rastejou silenciosamente em direção ao rato." },
+            { base: "cut", pastSimple: "cut", example: "She cut the paper with scissors.", portuguese: "Ela cortou o papel com a tesoura." },
+            { base: "deal", pastSimple: "dealt", example: "He dealt with the problem calmly.", portuguese: "Ele lidou com o problema com calma." },
+            { base: "dig", pastSimple: "dug", example: "The dog dug a hole in the garden.", portuguese: "O cachorro cavou um buraco no jardim." },
+            { base: "dive", pastSimple: "dived/dove", example: "He dived into the clear blue water. (Ambos são comuns, 'dived' é mais frequente)", portuguese: "Ele mergulhou na água azul clara." },
+            { base: "do", pastSimple: "did", example: "I did my homework before dinner.", portuguese: "Eu fiz minha lição de casa antes do jantar." },
+            { base: "draw", pastSimple: "drew", example: "She drew a beautiful landscape.", portuguese: "Ela desenhou uma bela paisagem." },
+            { base: "dream", pastSimple: "dreamt/dreamed", example: "I dreamt about flying last night. (Ambos são comuns, 'dreamt' é mais comum no britânico, 'dreamed' no americano)", portuguese: "Eu sonhei em voar ontem à noite." },
+            { base: "drink", pastSimple: "drank", example: "He drank all the water in his bottle.", portuguese: "Ele bebeu toda a água de sua garrafa." },
+            { base: "drive", pastSimple: "drove", example: "She drove to work early today.", portuguese: "Ela dirigiu para o trabalho cedo hoje." },
+            { base: "eat", pastSimple: "ate", example: "We ate pizza for lunch.", portuguese: "Nós comemos pizza no almoço." },
+            { base: "fall", pastSimple: "fell", example: "He fell off his bike.", portuguese: "Ele caiu da bicicleta." },
+            { base: "feed", pastSimple: "fed", example: "She fed the birds in the park.", portuguese: "Ela alimentou os pássaros no parque." },
+            { base: "feel", pastSimple: "felt", example: "I felt happy after seeing my friends.", portuguese: "Senti-me feliz depois de ver meus amigos." },
+            { base: "fight", pastSimple: "fought", example: "They fought bravely in the battle.", portuguese: "Eles lutaram bravamente na batalha." },
+            { base: "find", pastSimple: "found", example: "I found my lost keys under the couch.", portuguese: "Encontrei minhas chaves perdidas debaixo do sofá." },
+            { base: "flee", pastSimple: "fled", example: "The villagers fled from the invading army.", portuguese: "Os aldeões fugiram do exército invasor." },
+            { base: "fling", pastSimple: "flung", example: "He flung the stone into the river.", portuguese: "Ele arremessou a pedra no rio." },
+            { base: "fly", pastSimple: "flew", example: "The bird flew south for the winter.", portuguese: "O pássaro voou para o sul para o inverno." },
+            { base: "forbid", pastSimple: "forbade", example: "My parents forbade me to stay out late.", portuguese: "Meus pais me proibiram de ficar fora até tarde." },
+            { base: "foretell", pastSimple: "foretold", example: "The fortune teller foretold his future.", portuguese: "O vidente previu o futuro dele." },
+            { base: "forget", pastSimple: "forgot", example: "I forgot her name.", portuguese: "Esqueci o nome dela." },
+            { base: "forgive", pastSimple: "forgave", example: "She forgave him for his mistake.", portuguese: "Ela o perdoou pelo erro dele." },
+            { base: "forsake", pastSimple: "forsook", example: "He forsook his family and left town.", portuguese: "Ele abandonou sua família e deixou a cidade." },
+            { base: "freeze", pastSimple: "froze", example: "The water in the pipes froze overnight.", portuguese: "A água nos canos congelou durante a noite." },
+            { base: "get", pastSimple: "got", example: "I got a new job last week.", portuguese: "Consegui um novo emprego na semana passada." },
+            { base: "give", pastSimple: "gave", example: "She gave him a present.", portuguese: "Ela deu um presente a ele." },
+            { base: "go", pastSimple: "went", example: "They went to the beach yesterday.", portuguese: "Eles foram à praia ontem." },
+            { base: "grind", pastSimple: "ground", example: "He ground the coffee beans.", portuguese: "Ele moeu os grãos de café." },
+            { base: "grow", pastSimple: "grew", example: "The tree grew very tall.", portuguese: "A árvore cresceu muito alta." },
+            { base: "hang", pastSimple: "hung", example: "She hung her coat in the closet.", portuguese: "Ela pendurou o casaco no armário." },
+            { base: "have", pastSimple: "had", example: "We had a great time at the party.", portuguese: "Nos divertimos muito na festa." },
+            { base: "hear", pastSimple: "heard", example: "I heard a strange noise.", portuguese: "Ouvi um barulho estranho." },
+            { base: "hide", pastSimple: "hid", example: "He hid the candy from his sister.", portuguese: "Ele escondeu o doce da irmã." },
+            { base: "hit", pastSimple: "hit", example: "The ball hit the window.", portuguese: "A bola atingiu a janela." },
+            { base: "hold", pastSimple: "held", example: "She held his hand tightly.", portuguese: "Ela segurou a mão dele com força." },
+            { base: "hurt", pastSimple: "hurt", example: "My leg hurt after the fall.", portuguese: "Minha perna doeu depois da queda." },
+            { base: "keep", pastSimple: "kept", example: "He kept his promise.", portuguese: "Ele manteve sua promessa." },
+            { base: "kneel", pastSimple: "knelt", example: "He knelt down to pray.", portuguese: "Ele se ajoelhou para orar." },
+            { base: "know", pastSimple: "knew", example: "I knew the answer to the question.", portuguese: "Eu sabia a resposta para a pergunta." },
+            { base: "lay", pastSimple: "laid", example: "She laid the baby in the crib.", portuguese: "Ela deitou o bebê no berço." },
+            { base: "lead", pastSimple: "led", example: "He led the team to victory.", portuguese: "Ele liderou a equipe à vitória." },
+            { base: "lean", pastSimple: "leant/leaned", example: "He leaned against the wall. (Ambos são comuns, 'leaned' é mais frequente)", portuguese: "Ele se encostou na parede." },
+            { base: "leap", pastSimple: "leapt/leaped", example: "The deer leapt over the fence. (Ambos são comuns, 'leaped' é mais frequente)", portuguese: "O cervo saltou sobre a cerca." },
+            { base: "learn", pastSimple: "learnt/learned", example: "I learned a lot from that experience. (Ambos são comuns, 'learnt' é mais comum no britânico, 'learned' no americano)", portuguese: "Aprendi muito com aquela experiência." },
+            { base: "leave", pastSimple: "left", example: "She left her keys on the table.", portuguese: "Ela deixou as chaves na mesa." },
+            { base: "lend", pastSimple: "lent", example: "He lent me his car for the weekend.", portuguese: "Ele me emprestou o carro dele para o fim de semana." },
+            { base: "let", pastSimple: "let", example: "She let the dog out.", portuguese: "Ela soltou o cachorro." },
+            { base: "lie", pastSimple: "lay", example: "He lay down on the grass.", portuguese: "Ele deitou-se na grama." },
+            { base: "light", pastSimple: "lit/lighted", example: "He lit a candle when the power went out. (Ambos são comuns, 'lit' é mais frequente)", portuguese: "Ele acendeu uma vela quando a energia acabou." },
+            { base: "lose", pastSimple: "lost", example: "I lost my phone yesterday.", portuguese: "Perdi meu telefone ontem." },
+            { base: "make", pastSimple: "made", example: "She made a delicious cake.", portuguese: "Ela fez um bolo delicioso." },
+            { base: "mean", pastSimple: "meant", example: "I meant what I said.", portuguese: "Eu quis dizer o que disse." },
+            { base: "meet", pastSimple: "met", example: "We met our new neighbors.", portuguese: "Encontramos nossos novos vizinhos." },
+            { base: "mistake", pastSimple: "mistook", example: "I mistook him for his brother.", portuguese: "Eu o confundi com o irmão dele." },
+            { base: "mow", pastSimple: "mowed", example: "He mowed the lawn on Saturday.", portuguese: "Ele cortou a grama no sábado." },
+            { base: "overcome", pastSimple: "overcame", example: "She overcame many challenges.", portuguese: "Ela superou muitos desafios." },
+            { base: "overdo", pastSimple: "overdid", example: "He overdid the seasoning in the soup.", portuguese: "Ele exagerou no tempero da sopa." },
+            { base: "overtake", pastSimple: "overtook", example: "The fast car overtook the slower one.", portuguese: "O carro rápido ultrapassou o mais lento." },
+            { base: "overthrow", pastSimple: "overthrew", example: "The rebels overthrew the government.", portuguese: "Os rebeldes derrubaram o governo." },
+            { base: "pay", pastSimple: "paid", example: "I paid the bill immediately.", portuguese: "Paguei a conta imediatamente." },
+            { base: "plead", pastSimple: "pleaded/pled", example: "He pleaded guilty to the charges. (Ambos são comuns, 'pleaded' é mais frequente)", portuguese: "Ele se declarou culpado das acusações." },
+            { base: "prove", pastSimple: "proved", example: "He proved his innocence.", portuguese: "Ele provou sua inocência." },
+            { base: "put", pastSimple: "put", example: "She put the book on the shelf.", portuguese: "Ela colocou o livro na prateleira." },
+            { base: "quit", pastSimple: "quit", example: "He quit his job last month.", portuguese: "Ele largou o emprego no mês passado." },
+            { base: "read", pastSimple: "read", example: "I read an interesting book yesterday.", portuguese: "Li um livro interessante ontem." },
+            { base: "rid", pastSimple: "rid", example: "He rid his house of pests.", portuguese: "Ele livrou sua casa de pragas." },
+            { base: "ride", pastSimple: "rode", example: "She rode her bike to the park.", portuguese: "Ela andou de bicicleta até o parque." },
+            { base: "ring", pastSimple: "rang", example: "The phone rang loudly.", portuguese: "O telefone tocou alto." },
+            { base: "rise", pastSimple: "rose", example: "The sun rose early this morning.", portuguese: "O sol nasceu cedo hoje de manhã." },
+            { base: "run", pastSimple: "ran", example: "He ran a marathon last year.", portuguese: "Ele correu uma maratona no ano passado." },
+            { base: "saw", pastSimple: "sawed", example: "He sawed the wood into planks.", portuguese: "Ele serrou a madeira em tábuas." },
+            { base: "say", pastSimple: "said", example: "She said hello to everyone.", portuguese: "Ela disse olá para todos." },
+            { base: "see", pastSimple: "saw", example: "I saw a movie last night.", portuguese: "Assisti a um filme ontem à noite." },
+            { base: "seek", pastSimple: "sought", example: "They sought shelter from the storm.", portuguese: "Eles buscaram abrigo da tempestade." },
+            { base: "sell", pastSimple: "sold", example: "He sold his old car.", portuguese: "Ele vendeu seu carro velho." },
+            { base: "send", pastSimple: "sent", example: "I sent an email to my boss.", portuguese: "Enviei um e-mail para meu chefe." },
+            { base: "set", pastSimple: "set", example: "She set the table for dinner.", portuguese: "Ela arrumou a mesa para o jantar." },
+            { base: "sew", pastSimple: "sewed", example: "My grandmother sewed me a new dress.", portuguese: "Minha avó costurou um vestido novo para mim." },
+            { base: "shake", pastSimple: "shook", example: "He shook my hand firmly.", portuguese: "Ele apertou minha mão com firmeza." },
+            { base: "shear", pastSimple: "sheared", example: "The farmer sheared the sheep.", portuguese: "O fazendeiro tosquiou as ovelhas." },
+            { base: "shed", pastSimple: "shed", example: "The tree shed its leaves in autumn.", portuguese: "A árvore perdeu suas folhas no outono." },
+            { base: "shine", pastSimple: "shone", example: "The sun shone brightly today.", portuguese: "O sol brilhou forte hoje." },
+            { base: "shoot", pastSimple: "shot", example: "He shot the ball into the net.", portuguese: "Ele chutou a bola na rede." },
+            { base: "show", pastSimple: "showed", example: "She showed me her new house.", portuguese: "Ela me mostrou a casa nova dela." },
+            { base: "shrink", pastSimple: "shrank", example: "My sweater shrank in the wash.", portuguese: "Meu suéter encolheu na lavagem." },
+            { base: "shut", pastSimple: "shut", example: "He shut the door quietly.", portuguese: "Ele fechou a porta silenciosamente." },
+            { base: "sing", pastSimple: "sang", example: "She sang a beautiful song.", portuguese: "Ela cantou uma linda canção." },
+            { base: "sink", pastSimple: "sank", example: "The boat sank quickly.", portuguese: "O barco afundou rapidamente." },
+            { base: "sit", pastSimple: "sat", example: "I sat on the bench and waited.", portuguese: "Sentei-me no banco e esperei." },
+            { base: "slay", pastSimple: "slew", example: "The knight slew the dragon.", portuguese: "O cavaleiro matou o dragão." },
+            { base: "sleep", pastSimple: "slept", example: "I slept well last night.", portuguese: "Dormi bem ontem à noite." },
+            { base: "slide", pastSimple: "slid", example: "He slid on the ice.", portuguese: "Ele escorregou no gelo." },
+            { base: "sling", pastSimple: "slung", example: "He slung the bag over his shoulder.", portuguese: "Ele jogou a bolsa sobre o ombro." },
+            { base: "slit", pastSimple: "slit", example: "She slit the envelope open.", portuguese: "Ela abriu o envelope com um corte." },
+            { base: "smell", pastSimple: "smelt/smelled", example: "The soup smelt delicious. (Ambos são comuns, 'smelt' é mais comum no britânico, 'smelled' no americano)", portuguese: "A sopa cheirava delicioso." },
+            { base: "smite", pastSimple: "smote", example: "He smote the rock with his staff.", portuguese: "Ele golpeou a rocha com seu cajado." },
+            { base: "sow", pastSimple: "sowed", example: "He sowed seeds in the garden.", portuguese: "Ele semeou sementes no jardim." },
+            { base: "speak", pastSimple: "spoke", example: "She spoke clearly and confidently.", portuguese: "Ela falou clara e confiantemente." },
+            { base: "speed", pastSimple: "sped/speeded", example: "The car sped down the highway. (Ambos são comuns, 'sped' é mais frequente)", portuguese: "O carro acelerou pela rodovia." },
+            { base: "spell", pastSimple: "spelt/spelled", example: "He spelt the word correctly. (Ambos são comuns, 'spelt' é mais comum no britânico, 'spelled' no americano)", portuguese: "Ele soletrou a palavra corretamente." },
+            { base: "spend", pastSimple: "spent", example: "I spent all my money on vacation.", portuguese: "Gastei todo o meu dinheiro nas férias." },
+            { base: "spill", pastSimple: "spilt/spilled", example: "He accidentally spilt coffee on his shirt. (Ambos são comuns, 'spilt' é mais comum no britânico, 'spilled' no americano)", portuguese: "Ele acidentalmente derramou café na camisa." },
+            { base: "spin", pastSimple: "spun", example: "The dancer spun gracefully.", portuguese: "A dançarina girou graciosamente." },
+            { base: "spit", pastSimple: "spat", example: "He spat out the bad taste.", portuguese: "Ele cuspiu o gosto ruim." },
+            { base: "split", pastSimple: "split", example: "They split the pizza among themselves.", portuguese: "Eles dividiram a pizza entre si." },
+            { base: "spoil", pastSimple: "spoilt/spoiled", example: "The hot weather spoiled the food. (Ambos são comuns, 'spoilt' é mais comum no britânico, 'spoiled' no americano)", portuguese: "O tempo quente estragou a comida." },
+            { base: "spread", pastSimple: "spread", example: "She spread butter on the toast.", portuguese: "Ela espalhou manteiga na torrada." },
+            { base: "spring", pastSimple: "sprang", example: "He sprang into action to help.", portuguese: "Ele entrou em ação para ajudar." },
+            { base: "stand", pastSimple: "stood", example: "He stood by the window.", portuguese: "Ele ficou de pé perto da janela." },
+            { base: "steal", pastSimple: "stole", example: "Someone stole my bike last night.", portuguese: "Alguém roubou minha bicicleta ontem à noite." },
+            { base: "stick", pastSimple: "stuck", example: "The glue stuck the two pieces together.", portuguese: "A cola grudou as duas peças." },
+            { base: "sting", pastSimple: "stung", example: "A bee stung him on the arm.", portuguese: "Uma abelha o picou no braço." },
+            { base: "stink", pastSimple: "stank", example: "The garbage stank terribly.", portuguese: "O lixo cheirava terrivelmente." },
+            { base: "stride", pastSimple: "strode", example: "He strode confidently into the room.", portuguese: "Ele caminhou com confiança para dentro da sala." },
+            { base: "strike", pastSimple: "struck", example: "The clock struck midnight.", portuguese: "O relógio bateu meia-noite." },
+            { base: "strive", pastSimple: "strove", example: "She strove to achieve her goals.", portuguese: "Ela se esforçou para alcançar seus objetivos." },
+            { base: "swear", pastSimple: "swore", example: "He swore an oath of loyalty.", portuguese: "Ele jurou um juramento de lealdade." },
+            { base: "sweep", pastSimple: "swept", example: "She swept the floor clean.", portuguese: "Ela varreu o chão." },
+            { base: "swell", pastSimple: "swelled", example: "His ankle swelled after the injury.", portuguese: "Seu tornozelo inchou após a lesão." },
+            { base: "swim", pastSimple: "swam", example: "We swam in the ocean.", portuguese: "Nós nadamos no oceano." },
+            { base: "swing", pastSimple: "swung", example: "He swung the bat and hit the ball.", portuguese: "Ele balançou o taco e bateu na bola." },
+            { base: "take", pastSimple: "took", example: "She took a photo of the sunset.", portuguese: "Ela tirou uma foto do pôr do sol." },
+            { base: "teach", pastSimple: "taught", example: "He taught English for many years.", portuguese: "Ele ensinou inglês por muitos anos." },
+            { base: "tear", pastSimple: "tore", example: "She tore the letter into pieces.", portuguese: "Ela rasgou a carta em pedaços." },
+            { base: "tell", pastSimple: "told", example: "He told me a secret.", portuguese: "Ele me contou um segredo." },
+            { base: "think", pastSimple: "thought", example: "I thought about you all day.", portuguese: "Pensei em você o dia todo." },
+            { base: "thrive", pastSimple: "thrived/throve", example: "The business thrived in the new market. (Ambos são comuns, 'thrived' é mais frequente)", portuguese: "O negócio prosperou no novo mercado." },
+            { base: "throw", pastSimple: "threw", example: "He threw the ball to his dog.", portuguese: "Ele jogou a bola para seu cachorro." },
+            { base: "thrust", pastSimple: "thrust", example: "He thrust the sword into the scabbard.", portuguese: "Ele enfiou a espada na bainha." },
+            { base: "tread", pastSimple: "trod", example: "She trod carefully on the icy path.", portuguese: "Ela pisou com cuidado no caminho gelado." },
+            { base: "understand", pastSimple: "understood", example: "I understood the instructions perfectly.", portuguese: "Entendi as instruções perfeitamente." },
+            { base: "uphold", pastSimple: "upheld", example: "The court upheld the previous ruling.", portuguese: "O tribunal manteve a decisão anterior." },
+            { base: "upset", pastSimple: "upset", example: "The news upset her greatly.", portuguese: "A notícia a perturbou muito." },
+            { base: "wake", pastSimple: "woke/waked", example: "I woke up early this morning. (Ambos são comuns, 'woke' é mais frequente)", portuguese: "Acordei cedo esta manhã." },
+            { base: "wear", pastSimple: "wore", example: "She wore a beautiful dress to the party.", portuguese: "Ela usava um lindo vestido na festa." },
+            { base: "weave", pastSimple: "wove/weaved", example: "She wove a blanket from wool. (Ambos são comuns, 'wove' é mais frequente)", portuguese: "Ela teceu uma manta de lã." },
+            { base: "wed", pastSimple: "wedded/wed", example: "They wed in a small ceremony. (Ambos são comuns, 'wedded' é mais comum em sentido literal, 'wed' em sentido figurado ou em manchetes)", portuguese: "Eles se casaram em uma pequena cerimônia." },
+            { base: "weep", pastSimple: "wept", example: "She wept silently after hearing the news.", portuguese: "Ela chorou em silêncio depois de ouvir a notícia." },
+            { base: "win", pastSimple: "won", example: "Our team won the championship.", portuguese: "Nosso time ganhou o campeonato." },
+            { base: "wind", pastSimple: "wound", example: "He wound the rope around the post.", portuguese: "Ele enrolou a corda ao redor do poste." },
+            { base: "withdraw", pastSimple: "withdrew", example: "He withdrew money from the ATM.", portuguese: "Ele sacou dinheiro do caixa eletrônico." },
+            { base: "withhold", pastSimple: "withheld", example: "They withheld payment until the work was complete.", portuguese: "Eles retiveram o pagamento até que o trabalho estivesse completo." },
+            { base: "withstand", pastSimple: "withstood", example: "The old bridge withstood the flood.", portuguese: "A velha ponte resistiu à enchente." },
+            { base: "wring", pastSimple: "wrung", example: "She wrung out the wet towel.", portuguese: "Ela torceu a toalha molhada." },
+            { base: "write", pastSimple: "wrote", example: "I wrote a letter to my grandmother.", portuguese: "Escrevi uma carta para minha avó." }
+        ];
+
+        const VERBS_PER_PHASE = 25; // Number of verbs to show per phase
+        let shuffledVerbs = []; // Stores the randomized list of all verbs with their state (status, userAnswer)
+        let currentPhaseVerbs = []; // Stores the verbs for the current phase (subset of shuffledVerbs)
+        let incorrectVerbsInLastPhase = []; // Stores verbs the user got wrong in the last check (for retry option)
+        let currentPhaseIndex = 0; // Tracks the current phase number (0-indexed)
+        let totalPhases = 0; // Calculated total number of phases
+
+        // --- Get references to DOM elements ---
+        const verbTableBody = document.getElementById('verb-table-body');
+        const scoreDisplay = document.getElementById('score');
+        const totalQuestionsDisplay = document.getElementById('total-questions');
+        const currentPhaseDisplay = document.getElementById('current-phase-display');
+        const totalPhasesDisplay = document.getElementById('total-phases-display');
+        const phaseSelector = document.getElementById('phase-selector');
+        const incorrectVerbsSummaryDiv = document.getElementById('incorrect-verbs-summary'); // New div for incorrect verbs
+        const incorrectVerbsList = document.getElementById('incorrect-verbs-list');
+        const retryWrongBtn = document.getElementById('retry-wrong-btn');
+        const nextPhaseBtn = document.getElementById('next-phase-btn');
+        const showAllAnswersBtn = document.getElementById('show-all-answers-btn');
+        const downloadAnswersBtn = document.getElementById('download-answers-btn');
+
+        // --- Helper Functions ---
+
+        /**
+         * Shuffles an array in place using the Fisher-Yates (Knuth) algorithm.
+         * @param {Array} array The array to shuffle.
+         * @returns {Array} The shuffled array.
+         */
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]]; // Swap elements
+            }
+            return array;
+        }
+
+        /**
+         * Scrambles the letters of a string.
+         * @param {string} str The string to scramble.
+         * @returns {string} The scrambled string.
+         */
+        function shuffleString(str) {
+            // Remove alternative forms for scrambling, e.g., "was/were" becomes "was"
+            let cleanStr = str.split('/')[0];
+            let a = cleanStr.split(""); // Convert the string to an array of characters
+            let n = a.length;
+
+            for(let i = n - 1; i > 0; i--) {
+                let j = Math.floor(Math.random() * (i + 1));
+                let tmp = a[i];
+                a[i] = a[j];
+                a[j] = tmp;
+            }
+            return a.join(""); // Join the array of characters back into a string
+        }
+
+        /**
+         * Normalizes a string answer for comparison (lowercase, trimmed, handles slashes).
+         * @param {string} answer The user's input or correct answer.
+         * @returns {string} The normalized answer.
+         */
+        function normalizeAnswer(answer) {
+            return answer.toLowerCase().trim().replace(/\s*\/\s*/g, '/'); // Normalize case, trim whitespace, replace " / " with "/"
+        }
+
+        /**
+         * Displays a custom alert message.
+         * @param {string} message The message to display.
+         */
+        function customAlert(message) {
+            console.log("App Message:", message);
+            alert(message);
+        }
+
+        // --- Game Logic ---
+
+        /**
+         * Initializes the game, loading saved state if available, or starting a new game.
+         */
+        function initializeGame() {
+            const savedState = loadGameState();
+            if (savedState && savedState.shuffledVerbs && savedState.shuffledVerbs.length > 0) {
+                shuffledVerbs = savedState.shuffledVerbs;
+                currentPhaseIndex = savedState.currentPhaseIndex;
+                totalPhases = savedState.totalPhases || Math.ceil(shuffledVerbs.length / VERBS_PER_PHASE);
+                customAlert("Estado do jogo carregado com sucesso!");
+            } else {
+                // Initialize shuffledVerbs with status and userAnswer for a new game
+                shuffledVerbs = shuffleArray(allIrregularVerbs.map(verb => ({ ...verb, status: 'pending', userAnswer: '' })));
+                currentPhaseIndex = 0;
+                totalPhases = Math.ceil(shuffledVerbs.length / VERBS_PER_PHASE);
+                customAlert("Bem-vindo! Iniciando um novo jogo.");
+            }
+            populatePhaseSelector(); // Populate the dropdown
+            phaseSelector.value = currentPhaseIndex; // Set initial selection
+            startPhase(currentPhaseIndex); // Start the first (or loaded) phase
+            updateOverallScoreDisplay(); // Update overall scores
+            saveGameState(); // Initial save
+        }
+
+        /**
+         * Populates the phase selector with available options.
+         */
+        function populatePhaseSelector() {
+            phaseSelector.innerHTML = ''; // Clear existing options
+            for (let i = 0; i < totalPhases; i++) {
+                const option = document.createElement('option');
+                option.value = i;
+                option.textContent = `Fase ${i + 1}`;
+                phaseSelector.appendChild(option);
+            }
+            phaseSelector.value = currentPhaseIndex;
+        }
+
+        /**
+         * Starts a new phase of the game, either with a subset of verbs
+         * (e.g., incorrect ones from the previous round) or the next block from the main list.
+         * @param {number|Array} phaseIdentifier The index of the phase to start, or an array of verbs for retry.
+         */
+        function startPhase(phaseIdentifier) {
+            // Hide all action buttons and incorrect verbs summary initially
+            hidePhaseCompletionActions();
+
+            // Reset incorrectVerbsInLastPhase for the new phase
+            incorrectVerbsInLastPhase = [];
+
+            if (Array.isArray(phaseIdentifier)) {
+                // This is a "Retry Wrong Verbs" scenario
+                currentPhaseVerbs = phaseIdentifier;
+                currentPhaseDisplay.textContent = `Revisão`; // Special display for retry
+                totalPhasesDisplay.textContent = totalPhases; // Keep total phases consistent
+            } else {
+                // This is a standard phase selection by index
+                currentPhaseIndex = phaseIdentifier;
+                const startIndex = currentPhaseIndex * VERBS_PER_PHASE;
+                const endIndex = startIndex + VERBS_PER_PHASE;
+                currentPhaseVerbs = shuffledVerbs.slice(startIndex, endIndex);
+
+                if (currentPhaseVerbs.length === 0) {
+                    showEndOfGame();
+                    return;
+                }
+                updatePhaseDisplay(); // Update current phase number
+            }
+
+            renderTable(currentPhaseVerbs); // Render the table with the new verbs
+            // Focus on the first available input when starting a new phase
+            const firstInput = document.querySelector('#verb-table-body input[data-form-type="pastSimple"]:not([disabled])');
+            if (firstInput) {
+                firstInput.focus();
+            }
+        }
+
+        /**
+         * Renders the game table with the provided verbs, reflecting their saved state.
+         * @param {Array} verbs The array of verb objects to display.
+         */
+        function renderTable(verbs) {
+            verbTableBody.innerHTML = ''; // Clear existing table rows
+            verbs.forEach((verb, index) => {
+                const row = document.createElement('tr');
+                // Generate hint for the *first* past simple form (handles "was/were" -> "was" for hint)
+                const scrambledHint = shuffleString(verb.pastSimple.split('/')[0]);
+
+                let exampleText = '---';
+                let portugueseText = '---';
+                let inputClasses = '';
+                let statusIconHtml = '';
+                let isDisabled = false;
+                let isSubmitButtonDisabled = false;
+                let isHintHidden = false; // By default, hint is visible
+
+                if (verb.status === 'correct') {
+                    inputClasses = 'correct-input';
+                    statusIconHtml = '<span class="check-icon">✓</span>';
+                    exampleText = verb.example;
+                    portugueseText = verb.portuguese;
+                    isDisabled = true;
+                    isSubmitButtonDisabled = true;
+                    isHintHidden = true; // Hide hint if already correct
+                } else if (verb.status === 'incorrect') {
+                    inputClasses = 'incorrect-input';
+                    statusIconHtml = '<span class="cross-icon">✗</span>';
+                    // Example and Portuguese remain '---' if incorrect, unless showAllAnswers is called later
+                    isDisabled = true;
+                    isSubmitButtonDisabled = true;
+                    isHintHidden = true; // Hide hint if already incorrect
+                }
+                // If status is 'pending', default values (blank input, '---' for examples, enabled, hint visible) are used.
+
+                row.innerHTML = `
+                    <td class="font-medium text-gray-800">${verb.base}</td>
+                    <td class="simple-past-cell">
+                        <div class="scrambled-hint text-sm text-gray-500 mb-1 ${isHintHidden ? 'hidden' : ''}">${scrambledHint}</div>
+                        <input type="text" data-verb-index="${index}" data-form-type="pastSimple" value="${verb.userAnswer}" class="${inputClasses}" ${isDisabled ? 'disabled' : ''}>
+                        <button class="submit-line-button ${isSubmitButtonDisabled ? 'disabled' : ''}" data-verb-index="${index}" data-action="submit-line" ${isSubmitButtonDisabled ? 'disabled' : ''}>Verificar</button>
+                    </td>
+                    <td id="example-${index}">${exampleText}</td>
+                    <td id="portuguese-${index}">${portugueseText}</td>
+                    <td><span id="status-${index}" class="result-icon">${statusIconHtml}</span></td>
+                `;
+                verbTableBody.appendChild(row);
+            });
+        }
+
+        /**
+         * Updates the overall score and total questions displayed on the UI
+         * by re-calculating from the shuffledVerbs array.
+         */
+        function updateOverallScoreDisplay() {
+            let totalCorrect = 0;
+            let totalAttempted = 0;
+            shuffledVerbs.forEach(verb => {
+                if (verb.status === 'correct') {
+                    totalCorrect++;
+                    totalAttempted++;
+                } else if (verb.status === 'incorrect') {
+                    totalAttempted++;
+                }
+            });
+            scoreDisplay.textContent = totalCorrect;
+            totalQuestionsDisplay.textContent = totalAttempted;
+        }
+
+        /**
+         * Updates the current phase and total phases displayed on the UI.
+         */
+        function updatePhaseDisplay() {
+            currentPhaseDisplay.textContent = currentPhaseIndex + 1;
+            totalPhasesDisplay.textContent = totalPhases;
+            phaseSelector.value = currentPhaseIndex; // Keep selector in sync
+        }
+
+        /**
+         * Checks the user's answer for a single verb row.
+         * Updates UI with feedback (correct/incorrect) and disables input.
+         * Updates the global shuffledVerbs array.
+         * @param {number} index The index of the verb in the currentPhaseVerbs array.
+         */
+        function submitSingleVerb(index) {
+            const verbInPhase = currentPhaseVerbs[index];
+            if (!verbInPhase) return;
+
+            // Find the actual index in the global shuffledVerbs array
+            const globalIndex = shuffledVerbs.findIndex(v => v.base === verbInPhase.base);
+            const verbInGlobal = shuffledVerbs[globalIndex];
+
+            const pastSimpleInput = document.querySelector(`input[data-verb-index="${index}"][data-form-type="pastSimple"]`);
+            if (pastSimpleInput.disabled) return; // Already checked
+
+            const submitButton = pastSimpleInput.nextElementSibling;
+            const statusSpan = document.getElementById(`status-${index}`);
+            const exampleCell = document.getElementById(`example-${index}`);
+            const portugueseCell = document.getElementById(`portuguese-${index}`);
+            const scrambledHintDiv = pastSimpleInput.previousElementSibling;
+
+            const userPastSimple = normalizeAnswer(pastSimpleInput.value);
+            const correctPastSimpleOptions = verbInGlobal.pastSimple.split('/').map(normalizeAnswer);
+
+            let isCorrect = correctPastSimpleOptions.includes(userPastSimple) && userPastSimple !== '';
+
+            if (isCorrect) {
+                pastSimpleInput.classList.remove('incorrect-input');
+                pastSimpleInput.classList.add('correct-input');
+                statusSpan.innerHTML = '<span class="check-icon">✓</span>';
+                exampleCell.textContent = verbInGlobal.example;
+                portugueseCell.textContent = verbInGlobal.portuguese;
+                verbInGlobal.status = 'correct'; // Update global status
+            } else {
+                pastSimpleInput.classList.remove('correct-input');
+                pastSimpleInput.classList.add('incorrect-input');
+                statusSpan.innerHTML = '<span class="cross-icon">✗</span>';
+                exampleCell.textContent = '---'; // Keep hidden if incorrect
+                portugueseCell.textContent = '---'; // Keep hidden if incorrect
+                verbInGlobal.status = 'incorrect'; // Update global status
+            }
+            verbInGlobal.userAnswer = pastSimpleInput.value; // Save user's answer globally
+
+            pastSimpleInput.disabled = true;
+            submitButton.disabled = true;
+            if (scrambledHintDiv) scrambledHintDiv.classList.add('hidden'); // Hide hint after submission
+
+            updateOverallScoreDisplay(); // Recalculate and update global scores
+            saveGameState(); // Auto-save
+
+            // Check if all verbs in the current phase are submitted
+            const allCurrentPhaseVerbsSubmitted = currentPhaseVerbs.every(verb => {
+                const globalVerb = shuffledVerbs.find(v => v.base === verb.base);
+                return globalVerb && (globalVerb.status === 'correct' || globalVerb.status === 'incorrect');
+            });
+
+            if (allCurrentPhaseVerbsSubmitted) {
+                showPhaseCompletionActions();
+            } else {
+                moveToNextInput(index); // Move to next input if not all submitted
+            }
+        }
+
+        /**
+         * Moves the focus to the next available Simple Past input field.
+         * @param {number} currentIndex The index of the current verb.
+         */
+        function moveToNextInput(currentIndex) {
+            const allInputs = Array.from(document.querySelectorAll('#verb-table-body input[data-form-type="pastSimple"]'));
+            let nextInputFound = false;
+            for (let i = currentIndex + 1; i < allInputs.length; i++) {
+                if (!allInputs[i].disabled) {
+                    allInputs[i].focus();
+                    nextInputFound = true;
+                    break;
+                }
+            }
+        }
+
+        /**
+         * Reveals the action buttons and incorrect verbs summary after a phase is completed.
+         */
+        function showPhaseCompletionActions() {
+            let currentPhaseCorrectCount = 0;
+            incorrectVerbsInLastPhase = []; // Reset for this summary display
+
+            currentPhaseVerbs.forEach(verbInPhase => {
+                const globalVerb = shuffledVerbs.find(v => v.base === verbInPhase.base);
+                if (globalVerb) {
+                    if (globalVerb.status === 'correct') {
+                        currentPhaseCorrectCount++;
+                    } else if (globalVerb.status === 'incorrect') {
+                        incorrectVerbsInLastPhase.push(globalVerb);
+                    }
+                }
+            });
+
+            // Update incorrect verbs list on the main page
+            incorrectVerbsList.innerHTML = '';
+            if (incorrectVerbsInLastPhase.length > 0) {
+                incorrectVerbsSummaryDiv.classList.remove('hidden');
+                incorrectVerbsInLastPhase.forEach(verb => {
+                    const li = document.createElement('li');
+                    li.classList.add('mb-2');
+                    li.innerHTML = `
+                        <span class="font-bold text-red-700">${verb.base}</span> <br>
+                        &nbsp;&nbsp;Seu Simple Past: <span class="text-red-500">${verb.userAnswer || '[Vazio]'}</span> | Correto: <span class="text-green-600">${verb.pastSimple}</span> <br>
+                        &nbsp;&nbsp;Exemplo: <span class="text-blue-600">${verb.example}</span> <br>
+                        &nbsp;&nbsp;Português: <span class="text-blue-600">${verb.portuguese}</span>
+                    `;
+                    incorrectVerbsList.appendChild(li);
+                });
+                retryWrongBtn.classList.remove('hidden'); // Show retry button if there are errors
+            } else {
+                incorrectVerbsSummaryDiv.classList.add('hidden'); // Hide if all correct
+                retryWrongBtn.classList.add('hidden'); // Hide retry button if all correct
+            }
+
+            // Show other action buttons
+            showAllAnswersBtn.classList.remove('hidden');
+            downloadAnswersBtn.classList.remove('hidden');
+            nextPhaseBtn.classList.remove('hidden');
+
+            // Disable Next Phase button if it's the last phase
+            if (currentPhaseIndex + 1 >= totalPhases) {
+                nextPhaseBtn.disabled = true;
+            } else {
+                nextPhaseBtn.disabled = false;
+            }
+        }
+
+        /**
+         * Hides all action buttons and the incorrect verbs summary.
+         * Used when starting a new phase.
+         */
+        function hidePhaseCompletionActions() {
+            showAllAnswersBtn.classList.add('hidden');
+            downloadAnswersBtn.classList.add('hidden');
+            retryWrongBtn.classList.add('hidden');
+            nextPhaseBtn.classList.add('hidden');
+            incorrectVerbsSummaryDiv.classList.add('hidden');
+            incorrectVerbsList.innerHTML = ''; // Clear list content
+        }
+
+        /**
+         * Displays all correct answers in the table for the current phase, visually marking them.
+         */
+        function showAllAnswers() {
+            currentPhaseVerbs.forEach((verb, index) => {
+                const pastSimpleInput = document.querySelector(`input[data-verb-index="${index}"][data-form-type="pastSimple"]`);
+                const statusSpan = document.getElementById(`status-${index}`);
+                const submitButton = pastSimpleInput.nextElementSibling;
+                const exampleCell = document.getElementById(`example-${index}`);
+                const portugueseCell = document.getElementById(`portuguese-${index}`);
+                const scrambledHintDiv = pastSimpleInput.previousElementSibling;
+
+                pastSimpleInput.value = verb.pastSimple.split('/')[0];
+                pastSimpleInput.classList.remove('incorrect-input');
+                pastSimpleInput.classList.add('correct-input');
+                statusSpan.innerHTML = '<span class="check-icon">✓</span>';
+                pastSimpleInput.disabled = true;
+                submitButton.disabled = true;
+                if (scrambledHintDiv) scrambledHintDiv.classList.add('hidden'); // Hide hint
+
+                exampleCell.textContent = verb.example;
+                portugueseCell.textContent = verb.portuguese;
+            });
+            showAllAnswersBtn.disabled = true; // Disable this button after use
+            customAlert("Todas as respostas reveladas para esta fase!");
+        }
+
+        /**
+         * Generates and downloads a text file with all current phase verbs and their correct details.
+         */
+        function downloadAnswers() {
+            let content = "Desafio de Verbos Irregulares - Respostas da Fase " + (currentPhaseIndex + 1) + "\n\n";
+            content += "Forma Base | Simple Past | Frase Exemplo | Tradução Português\n";
+            content += "----------|-------------|-----------------|----------------------\n";
+
+            currentPhaseVerbs.forEach(verb => {
+                content += `${verb.base} | ${verb.pastSimple} | ${verb.example} | ${verb.portuguese}\n`;
+            });
+
+            const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `verbos_irregulares_fase_${currentPhaseIndex + 1}_respostas.txt`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            customAlert("Respostas baixadas!");
+        }
+
+        /**
+         * Handles the action when the "Tentar Novamente (Erros)" button is clicked.
+         * Restarts a phase with only the verbs the user got wrong.
+         * Resets their status to 'pending' for retry.
+         */
+        function handleRetryWrong() {
+            // Filter global shuffledVerbs to get only the incorrect ones from the current phase's display
+            const verbsToRetry = currentPhaseVerbs.filter(verbInPhase => {
+                const globalVerb = shuffledVerbs.find(v => v.base === verbInPhase.base);
+                return globalVerb && globalVerb.status === 'incorrect';
+            }).map(verb => {
+                // Reset status to pending and clear userAnswer for retry in the global list
+                const globalVerb = shuffledVerbs.find(v => v.base === verb.base);
+                if (globalVerb) {
+                    globalVerb.status = 'pending';
+                    globalVerb.userAnswer = '';
+                }
+                return globalVerb; // Return the updated global verb reference
+            }).filter(Boolean); // Filter out any null/undefined if find returns nothing
+
+            if (verbsToRetry.length > 0) {
+                shuffleArray(verbsToRetry); // Shuffle the verbs to retry to give a fresh order
+                startPhase(verbsToRetry); // Start a new phase with only these verbs
+                updateOverallScoreDisplay(); // Score might change after retrying
+                saveGameState();
+            } else {
+                customAlert("Não há verbos incorretos para tentar novamente nesta fase!");
+                hidePhaseCompletionActions(); // Hide buttons if nothing to retry
+            }
+        }
+
+        /**
+         * Handles the action when the "Próxima Fase" button is clicked.
+         * Moves to the next block of 25 verbs.
+         */
+        function handleNextPhase() {
+            hidePhaseCompletionActions(); // Hide buttons before moving to next phase
+            if (currentPhaseIndex + 1 < totalPhases) {
+                currentPhaseIndex++; // Increment phase counter
+                phaseSelector.value = currentPhaseIndex; // Update selector
+                startPhase(currentPhaseIndex); // Start the next phase with new verbs
+                saveGameState(); // Auto-save after starting next phase
+            } else {
+                showEndOfGame();
+            }
+        }
+
+        /**
+         * Displays the end-of-game message when all verbs are completed.
+         */
+        function showEndOfGame() {
+            // Display final score and message directly on page or use a simple alert
+            customAlert(`Fim de Jogo! Sua pontuação final é ${scoreDisplay.textContent} de ${totalQuestionsDisplay.textContent}.\n\nParabéns! Você completou todos os verbos irregulares!`);
+            hidePhaseCompletionActions(); // Hide all action buttons
+            // Optionally, clear the table or show a completion message in the table area
+            verbTableBody.innerHTML = '<tr><td colspan="5" class="text-center text-xl text-blue-700 py-10">Parabéns! Você completou todos os verbos irregulares!</td></tr>';
+            phaseSelector.disabled = true; // Disable phase selector at end of game
+            localStorage.removeItem('irregularVerbsGame'); // Clear saved game state
+        }
+
+        // --- Local Storage Functions for Saving/Loading Progress ---
+
+        /**
+         * Saves the current game state to localStorage.
+         */
+        function saveGameState() {
+            const gameState = {
+                shuffledVerbs: shuffledVerbs, // Save the entire shuffled list with status/userAnswer
+                currentPhaseIndex: currentPhaseIndex,
+                totalPhases: totalPhases
+            };
+            try {
+                localStorage.setItem('irregularVerbsGame', JSON.stringify(gameState));
+            } catch (e) {
+                console.error("Erro ao salvar o estado do jogo:", e);
+                customAlert('Falha ao salvar o progresso. Verifique as configurações de armazenamento do seu navegador.');
+            }
+        }
+
+        /**
+         * Loads the game state from localStorage.
+         * @returns {Object|null} The saved game state or null if no state found or an error occurred.
+         */
+        function loadGameState() {
+            try {
+                const savedState = localStorage.getItem('irregularVerbsGame');
+                return savedState ? JSON.parse(savedState) : null;
+            } catch (e) {
+                console.error("Erro ao carregar o estado do jogo:", e);
+                localStorage.removeItem('irregularVerbsGame');
+                return null;
+            }
+        }
+
+        // --- Event Listeners ---
+        window.addEventListener('load', initializeGame);
+
+        // Listener for the "Tentar Novamente (Erros)" button
+        retryWrongBtn.addEventListener('click', handleRetryWrong);
+
+        // Listener for the "Próxima Fase" button
+        nextPhaseBtn.addEventListener('click', handleNextPhase);
+
+        // Listener for the "Mostrar Todas as Respostas" button
+        showAllAnswersBtn.addEventListener('click', showAllAnswers);
+
+        // Listener for the "Baixar Respostas" button
+        downloadAnswersBtn.addEventListener('click', downloadAnswers);
+
+        // Listener for the phase selector
+        phaseSelector.addEventListener('change', (event) => {
+            const selectedPhaseIndex = parseInt(event.target.value);
+            startPhase(selectedPhaseIndex);
+            saveGameState(); // Save state after jumping phases
+        });
+
+        // Event listener for the per-line submission buttons (delegated to table body)
+        verbTableBody.addEventListener('click', function(event) {
+            if (event.target.dataset.action === 'submit-line') {
+                const index = parseInt(event.target.dataset.verbIndex);
+                submitSingleVerb(index);
+            }
+        });
+
+        // Enhance user experience by allowing Enter key to submit and navigate
+        verbTableBody.addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                const targetInput = event.target;
+                if (targetInput.tagName === 'INPUT' && targetInput.dataset.formType === 'pastSimple') {
+                    const submitButton = targetInput.nextElementSibling;
+                    if (submitButton && !submitButton.disabled) {
+                        submitButton.click();
+                        event.preventDefault(); // Prevent default Enter key behavior
+                    }
+                }
+            }
+        });
+
+    </script>
+</body>
+</html>
